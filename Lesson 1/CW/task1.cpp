@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
 
@@ -14,25 +15,22 @@ struct transaction
 	int amount_goods;
 };
 
-void print_price(struct transaction check[], int size)
+/**void print_price(struct transaction check[], int size)
 {
+	
 	for (int i = 0; i < size-1; i++)
 	{
-		printf("\n\n==========================\n");
-		printf("\nTransaction ID: %d;\nPrice: %d;\nGoods:%s;\nAmount of goods: %d;\n", check[i].id, check[i].price, check[i].description, check[i].amount_goods);
-		printf("\n==========================\n");
+		
 	}
+
 }
 
-int max_goods(struct transaction check[], int size)
+void max_goods(struct transaction check[], int size)
 {
-	int max_g = 0;
+	
 	for (int i = 0; i < size - 1; i++)
 	{
-		if (max_g < check[i].amount_goods)
-		{
-			max_g = check[i].amount_goods;
-		}
+		
 	}
 
 
@@ -47,20 +45,11 @@ int max_goods(struct transaction check[], int size)
 			printf("\n==========================\n");
 		}
 	}
-	return max_g;
 }
 
 void min_goods(struct transaction check[], int size)
 {
-	int min_g = 50;
-
-	for (int i = 0; i < size - 1; i++)
-	{
-		if (min_g > check[i].amount_goods)
-		{
-			min_g = check[i].amount_goods;
-		}
-	}
+	
 
 
 	printf("\n\n\n|||MINIMAL GOODS||| \n\n");
@@ -75,16 +64,37 @@ void min_goods(struct transaction check[], int size)
 		}
 	}
 
-}
+}**/
 
-float avg_price(struct transaction check[], int size)
+float avg_min_max(struct transaction check[], int size)
 {
 	float price = 0;
+	int min_g = 50;
+	int max_g = 0;
+
+
 	for (int i = 0; i < size - 1; i++)
 	{
+
+		//printf("\n\n==========================\n");
+		//printf("\nTransaction ID: %d;\nPrice: %d;\nGoods:%s;\nAmount of goods: %d;\n", check[i].id, check[i].price, check[i].description, check[i].amount_goods);
+		//printf("\n==========================\n");
+
 		price = price + check[i].price;
+
+		if (min_g > check[i].amount_goods)
+		{
+			min_g = check[i].amount_goods;
+		}
+
+		if (max_g < check[i].amount_goods)
+		{
+			max_g = check[i].amount_goods;
+		}
 	}
 
+	printf("\nMax goods: %d\n", max_g);
+	printf("\nMin goods: %d\n", min_g);
 	float result = price / (size - 1);
 	return result;
 
@@ -96,7 +106,6 @@ int check_amount(struct transaction check, int size)
 	int len = strlen(check.description);
 
 	for (int j = 0; j < len; j++)
-
 	{
 		if (check.description[j] == ',')
 		{
@@ -139,41 +148,40 @@ int main()
 	check = (transaction*)malloc(sizeof(transaction)*size);
 	cbuf = (transaction*)malloc(sizeof(transaction)*size);
 
-
+	clock_t time_begin = clock();
 	errno_t err;
-	err = fopen_s(&file, "C:\\Users\\uc2\\Desktop\\files\\transactions.txt", "r");
+	err = fopen_s(&file, "C:\\Users\\uc2\\Desktop\\files\\all_transactions.txt", "r");
 	if (err)
 		printf_s("The file cannot open \n");
 	else
 	{
-		while (fscanf_s(file, "%d;%d;%500s", &one_check.id, &one_check.price, one_check.description, 500) != EOF)
+		while (fscanf_s(file, "%d;%d;%500s", &check[i].id, &check[i].price, check[i].description, 500) != EOF)
 		{
-			check[i].id = one_check.id;
-			check[i].price = one_check.price;
-			strcpy_s(check[i].description, one_check.description);
 			check[i].amount_goods = check_amount(check[i], size);
 			i++;
 
 			if (i == size)
 			{
-				size = size + 1;
+				size = size+size*10;
 
 				cbuf = (transaction*)realloc(check, size * sizeof(transaction));
 				check = cbuf;
 			}
 		}
 	}
+	clock_t time_end = clock();
+	printf("Time: %.2fs\n", (double)(time_end - time_begin) / CLOCKS_PER_SEC);
 
-	print_price(check, size);
-	printf("\nAverage price: %.2f USD;\n", avg_price(check, size));
+	size = i+1;
 
-	max_goods(check, size);
-	min_goods(check, size);
+	//print_price(check, size);
+	printf("\nAverage price: %.2f USD;\n", avg_min_max(check, size));
+
+	
+	clock_t end = clock();
+	printf("Time: %.2fs\n", (double)(end - time_end) / CLOCKS_PER_SEC);
+
 	search(check, size);
-
-
-
-
 
     return 0;
 }
