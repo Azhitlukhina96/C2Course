@@ -1,11 +1,10 @@
-// ConsoleApplication6.cpp: определяет точку входа для консольного приложения.
+// ConsoleApplication1.cpp: определяет точку входа для консольного приложения.
 //
 
-
 #include "stdafx.h"
-#include <cstdio>
-#include <stdlib.h>
-#include <string>
+#include<cstdio>
+#include<stdlib.h>
+#include<string>
 #include <locale>
 #include <math.h>
 
@@ -144,7 +143,7 @@ bool parse(char *input_string, int &result)
 char* polish_notation(char *input_string)
 {
 	Stack *operands = NULL;
-	char *output_string = (char*)malloc(sizeof(char) * 80);
+	char *output_string = (char*)malloc(sizeof(char) * BUFFER_SIZE);
 	int k, point;
 	k = point = 0;
 	while (input_string[k] != '\0' && input_string[k] != '\n')
@@ -192,20 +191,25 @@ int main()
 {
 	FILE *operations_file;
 	FILE *result_file;
+	printf_s("Trying to open a file: operations.txt ...\n");
 	errno_t err = fopen_s(&operations_file, "E:\\operations.txt", "r");
 	if (err)
 	{
-		printf_s("The operations file cannot open\n");
+		printf_s("The file operations.txt was not opened\n");
 		return 0;
 	}
-	err = fopen_s(&result_file, "E:\\result.txt", "a+");
+	printf_s("Success\n");
+	printf_s("Trying to open a file: result.txt ...\n");
+	err = fopen_s(&result_file, "E:\\result.txt", "w");
 	if (err)
 	{
-		printf_s("The result file cannot open\n");
+		printf_s("The file result.txt was not opened\n");
 		return 0;
 	}
-
-	char buffer[BUFFER_SIZE];
+	printf_s("Success\n");
+	printf_s("Processing data ...\n");
+	char *buffer;
+	buffer = (char*)malloc(sizeof(char) * BUFFER_SIZE);
 	char *polish_string;
 	int result;
 	while (fgets(buffer, BUFFER_SIZE, operations_file) != NULL)
@@ -214,9 +218,10 @@ int main()
 		if (parse(polish_string, result))
 			fprintf(result_file, "%d\n", result);
 		else
-			fprintf(result_file, "Cannot divide by zero (NaN)\n");
+			fprintf(result_file, "NaN\n");
 	}
-	printf_s("Saved into result.txt\n");
+	printf_s("Success\n");
+	printf_s("The result was wtitten into result.txt file\n");
 
 	return 0;
 }
